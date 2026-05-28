@@ -141,3 +141,123 @@ print("\nVariables categoricas:")
 print(variables_categoricas)
 
 print("\nTransformacion completada.")
+
+# =========================
+# MODELOS
+# =========================
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+from xgboost import XGBClassifier
+
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    roc_auc_score
+)
+
+# =========================
+# LOGISTIC REGRESSION
+# =========================
+
+modelo_logistico = LogisticRegression(
+    max_iter=1000
+)
+
+modelo_logistico.fit(
+    X_train_transformado,
+    y_train
+)
+
+pred_logistico = modelo_logistico.predict(
+    X_test_transformado
+)
+
+# =========================
+# RANDOM FOREST
+# =========================
+
+modelo_rf = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42
+)
+
+modelo_rf.fit(
+    X_train_transformado,
+    y_train
+)
+
+pred_rf = modelo_rf.predict(
+    X_test_transformado
+)
+
+# =========================
+# XGBOOST
+# =========================
+
+modelo_xgb = XGBClassifier(
+    random_state=42,
+    eval_metric="logloss"
+)
+
+modelo_xgb.fit(
+    X_train_transformado,
+    y_train
+)
+
+pred_xgb = modelo_xgb.predict(
+    X_test_transformado
+)
+
+# =========================
+# METRICAS
+# =========================
+
+print("\n==============================")
+print("LOGISTIC REGRESSION")
+print("==============================")
+
+print(
+    classification_report(
+        y_test,
+        pred_logistico
+    )
+)
+
+print("\n==============================")
+print("RANDOM FOREST")
+print("==============================")
+
+print(
+    classification_report(
+        y_test,
+        pred_rf
+    )
+)
+
+print("\n==============================")
+print("XGBOOST")
+print("==============================")
+
+print(
+    classification_report(
+        y_test,
+        pred_xgb
+    )
+)
+import joblib
+
+modelo_final = Pipeline([
+    ("preprocesador", preprocesador),
+    ("modelo", modelo_rf)
+])
+
+modelo_final.fit(X_train, y_train)
+
+ruta_modelo = Path("models/model_pipeline.joblib")
+
+joblib.dump(modelo_final, ruta_modelo)
+
+print("\nModelo final guardado correctamente.")
